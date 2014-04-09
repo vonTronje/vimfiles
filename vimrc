@@ -46,16 +46,16 @@ set norelativenumber
 set undofile
 
 " Auto adjust window sizes when they become current
-set winwidth=84
-set winheight=5
-set winminheight=5
-set winheight=999
-
-set splitbelow splitright
-
-if has('mouse')
-  set mouse=a
-endif
+" set winwidth=84
+" set winheight=5
+" set winminheight=5
+" set winheight=999
+"
+" set splitbelow splitright
+"
+" if has('mouse')
+"   set mouse=a
+" endif
 
 "  ---------------------------------------------------------------------------
 "  Text Formatting
@@ -73,7 +73,7 @@ set formatoptions=n
 " check to make sure vim has been compiled with colorcolumn support
 " before enabling it
 if exists("+colorcolumn")
-  set colorcolumn=80
+  set colorcolumn=79
 endif
 
 "  ---------------------------------------------------------------------------
@@ -84,14 +84,14 @@ endif
 " the best way to ween yourself of arrow keys on to hjkl)
 " http://yehudakatz.com/2010/07/29/everyone-who-tried-to-convince-me-to-use-vim-was-wrong/
 
-" nnoremap <Left> :echoe "Use h"<CR>
-" nnoremap <Right> :echoe "Use l"<CR>
-" nnoremap <Up> :echoe "Use k"<CR>
-" nnoremap <Down> :echoe "Use j"<CR>"
-" inoremap <up> <nop>
-" inoremap <down> <nop>
-" inoremap <left> <nop>
-" inoremap <right> <nop>
+nnoremap <Left> :echoe "Use h"<CR>
+nnoremap <Right> :echoe "Use l"<CR>
+nnoremap <Up> :echoe "Use k"<CR>
+nnoremap <Down> :echoe "Use j"<CR>"
+inoremap <up> <nop>
+inoremap <down> <nop>
+inoremap <left> <nop>
+inoremap <right> <nop>
 
 " Searching / moving
 nnoremap / /\v
@@ -107,8 +107,12 @@ nmap n nzz
 nmap N Nzz
 
 " ACK
-set grepprg=ack
-nnoremap <leader>a :Ack
+" set grepprg=ack
+" nnoremap <leader>a :Ack
+
+" AG
+" let g:ackprg = 'ag --nogroup --nocolor --column'
+nnoremap <leader>a :Ag
 
 " Easy commenting
 nnoremap // :TComment<CR>
@@ -122,13 +126,20 @@ nmap <leader>d :Bclose<CR>
 " close all buffers
 nmap <leader>D :bufdo bd<CR>
 
+" Move between splits {{{
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+" }}}
+
 " Ignore some binary, versioning and backup files when auto-completing
 set wildignore=.svn,CVS,.git,*.swp,*.jpg,*.png,*.gif,*.pdf,*.bak
 " Set a lower priority for .old files
 set suffixes+=.old
 
-" rvm-vim automatically as you switch from buffer to buffer
-:autocmd BufEnter * Rvm
+" pry
+noremap <leader>p orequire 'pry'; binding.pry <Esc>
 
 "  ---------------------------------------------------------------------------
 "  Function Keys
@@ -154,8 +165,10 @@ let g:AutoClosePairs = {'(': ')', '{': '}', '[': ']', '"': '"', "'": "'", '#{': 
 let g:AutoCloseProtectedRegions = ["Character"]
 
 " CtrlP
-nmap <leader>f :CtrlP<cr>
-
+let g:ctrlp_mruf_relative = 1
+let g:ctrlp_map = '<Leader>f'
+let g:ctrlp_cmd = 'CtrlPMixed'
+let g:ctrlp_mruf_max = 0
 " Add settings for tabular
 inoremap <silent> <Bar>   <Bar><Esc>:call <SID>align()<CR>a
 
@@ -181,8 +194,11 @@ if exists(":Tab")
 endif
 
 " Powerline
-set guifont=DejaVu\ Sans\ Mono\ for\ Powerline:h12
-let g:Powerline_symbols='fancy'
+" set guifont=DejaVu\ Sans\ Mono\ for\ Powerline:h12
+" let g:Powerline_symbols='fancy'
+
+" Airline
+let g:airline_powerline_fonts = 1
 
 "  ---------------------------------------------------------------------------
 "  Language Mappings
@@ -244,9 +260,10 @@ endif
 "  Colors
 "  ---------------------------------------------------------------------------
 " let g:solarized_termcolors=256
-set background=dark
+set background=light
 colorscheme solarized
 
+let g:airline_theme='light'
 "  ---------------------------------------------------------------------------
 "  Misc
 "  ---------------------------------------------------------------------------
@@ -257,3 +274,62 @@ colorscheme solarized
 autocmd! bufwritepost .vimrc source %
 autocmd! bufwritepost vimrc source %
 
+function! Buflist()
+    redir => bufnames
+    silent ls
+    redir END
+    let list = []
+    for i in split(bufnames, "\n")
+        let buf = split(i, '"' )
+        call add(list, buf[-2])
+|   endfor
+    return list
+endfunction
+
+function! Bdeleteonly()
+    let list = filter(Buflist(), 'v:val != bufname("%")')
+    for buffer in list
+        exec "bdelete ".buffer
+    endfor
+endfunction
+
+command! Bonly :silent call Bdeleteonly()
+
+vmap <leader>em :call ExtractMethod()<CR>
+" Extract Method
+vmap <leader>em :call ExtractMethod()<CR>
+
+function! ExtractMethod() range
+  let args = split(inputdialog("Name of new method:"))
+
+  let name = args[0]
+
+  if len(args) > 1
+    let param = "(".args[1].")"
+  else
+    let param = ""
+  endif
+
+  " wrap selection with def and end
+  '<
+  exe "normal! O\<BS>def \<Esc>"
+  '>
+  exe "normal! oend\<Esc>"
+
+  " move extracted method to clipboard and under current method
+  '<
+  exe "normal! kV/\\<end\\>\<CR>d O".name. param
+  '>
+  exe "normal! k /def\<CR> k0O \<Esc>p"
+
+  " move cursor to method name
+  exe "normal! A" .name. param. "\<ESC>"
+
+  "fix indentation
+  exe "normal! V/\\<end\\>\<CR>=="
+
+endfunction
+
+map <Leader>t :call RunCurrentSpecFile()<CR>
+map <Leader>s :call RunNearestSpec()<CR>
+map <Leader>l :call RunLastSpec()<CR>
