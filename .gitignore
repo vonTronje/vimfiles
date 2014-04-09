@@ -3,3 +3,5 @@ bundle
 eclim
 plugin
 snippets
+syntax
+vim-rspec
