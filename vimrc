@@ -113,6 +113,8 @@ nmap N Nzz
 " AG
 " let g:ackprg = 'ag --nogroup --nocolor --column'
 nnoremap <leader>a :Ag
+let g:agprg="ag --ignore=tmp --ignore=log --ignore=db --ignore=bin --ignore=coverage --ignore='jquery*' --ignore='bootstrap*' --ignore='*foundation' --ignore='app/assets/javascripts/public/*.js' --column"
+
 
 " Easy commenting
 nnoremap // :TComment<CR>
