@@ -169,6 +169,8 @@ let g:ctrlp_mruf_relative = 1
 let g:ctrlp_map = '<Leader>f'
 let g:ctrlp_cmd = 'CtrlPMixed'
 let g:ctrlp_mruf_max = 0
+let g:ctrlp_custom_ignore = '\v(public/assets/|tmp/cache/assets/)'
+
 " Add settings for tabular
 inoremap <silent> <Bar>   <Bar><Esc>:call <SID>align()<CR>a
 
