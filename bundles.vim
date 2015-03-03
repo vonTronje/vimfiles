@@ -39,6 +39,7 @@ Bundle 'git://github.com/kchmck/vim-coffee-script.git'
 Bundle 'git://github.com/vim-scripts/jQuery.git'
 Bundle 'git://github.com/cakebaker/scss-syntax.vim.git'
 Bundle 'derekwyatt/vim-scala'
+Bundle 'git://github.com/fatih/vim-go.git'
 
 filetype plugin indent on     " and turn it back on!
 
