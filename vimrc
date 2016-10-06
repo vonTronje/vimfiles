@@ -136,7 +136,7 @@ nnoremap <C-l> <C-w>l
 " }}}
 
 " Ignore some binary, versioning and backup files when auto-completing
-set wildignore=.svn,CVS,.git,*.swp,*.jpg,*.png,*.gif,*.pdf,*.bak
+set wildignore=.svn,CVS,.git,*.swp,*.jpg,*.png,*.gif,*.pdf,*.bak,**/docker_app/**
 " Set a lower priority for .old files
 set suffixes+=.old
 
